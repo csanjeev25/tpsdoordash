@@ -1,6 +1,7 @@
 package com.tps.challenge.core.data.di
 
 import android.app.Application
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun getApplication(@ApplicationContext application: Application): Application {
+    fun provideContext(@ApplicationContext application: Application): Context {
         return application
     }
 }

@@ -6,8 +6,9 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.tps.challenge.core.domain.model.Location
 import com.tps.challenge.core.domain.preferences.Preferences
+import javax.inject.Inject
 
-class DefaultPreferences(
+class DefaultPreferences @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val gson: Gson
 ): Preferences {

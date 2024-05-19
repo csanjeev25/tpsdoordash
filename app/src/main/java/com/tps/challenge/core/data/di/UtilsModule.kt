@@ -10,6 +10,7 @@ import com.tps.challenge.core.domain.utils.Logger
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -18,7 +19,7 @@ import javax.inject.Singleton
 object UtilsModule {
     @Singleton
     @Provides
-    fun provideNetworkHelper(context: Context): NetworkHelper {
+    fun provideNetworkHelper(@ApplicationContext context: Context): NetworkHelper {
         return NetworkHelperImpl(context)
     }
 

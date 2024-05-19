@@ -10,24 +10,23 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewScoped
-import retrofit2.Retrofit
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
 @InstallIn(ViewModelComponent::class)
 object StoreDataModule {
     @Provides
-    @ViewScoped
+    @ViewModelScoped
     fun provideStoreApiService(networkService: NetworkService): StoreApiService = networkService.create(StoreApiService::class.java)
 
     @Provides
-    @ViewScoped
+    @ViewModelScoped
     fun provideStoreListRepository(storeApiService: StoreApiService): StoreListRepository {
         return StoreListRepositoryImpl(storeApiService)
     }
 
     @Provides
-    @ViewScoped
+    @ViewModelScoped
     fun provideStoreDetailsRepository(storeApiService: StoreApiService): StoreDetailsRepository {
         return StoreDetailsRepositoryImpl(storeApiService)
     }
