@@ -51,11 +51,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
 
-    // Dagger
-    val daggerVersion = "2.46.1"
-    implementation("com.google.dagger:dagger:${daggerVersion}")
-    kapt("com.google.dagger:dagger-compiler:${daggerVersion}")
-    kapt("com.google.dagger:dagger-android-processor:${daggerVersion}")
+
+
+    val hilt_version = "2.45"
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
 
     // AndroidX
     implementation("androidx.core:core-ktx:1.10.1")
@@ -69,6 +71,8 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.14.2")
     kapt("com.github.bumptech.glide:compiler:4.13.0")
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
