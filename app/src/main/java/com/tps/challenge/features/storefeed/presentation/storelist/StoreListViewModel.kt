@@ -4,9 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tps.challenge.Constants
-import com.tps.challenge.Manifest
 import com.tps.challenge.R
-import com.tps.challenge.core.domain.model.Location
 import com.tps.challenge.core.domain.remote.NetworkHelper
 import com.tps.challenge.core.domain.usecase.LocationUseCases
 import com.tps.challenge.core.domain.utils.DispatcherProvider
@@ -19,8 +17,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.ArrayList
 import javax.inject.Inject
 
 @HiltViewModel
