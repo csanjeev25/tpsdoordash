@@ -74,6 +74,9 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
 
+    //Google
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.9.2")

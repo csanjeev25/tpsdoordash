@@ -1,6 +1,9 @@
 package com.tps.challenge.core.data.di
 
 import android.content.Context
+import android.net.ConnectivityManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.tps.challenge.core.data.utils.DefaultDispatcherProvider
 import com.tps.challenge.core.data.remote.NetworkHelperImpl
 import com.tps.challenge.core.data.utils.AppLogger
@@ -19,8 +22,14 @@ import javax.inject.Singleton
 object UtilsModule {
     @Singleton
     @Provides
-    fun provideNetworkHelper(@ApplicationContext context: Context): NetworkHelper {
-        return NetworkHelperImpl(context)
+    fun provideConnectivityManager(@ApplicationContext context: Context): ConnectivityManager {
+        return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
+
+    @Singleton
+    @Provides
+    fun provideNetworkHelper(connectivityManager: ConnectivityManager): NetworkHelper {
+        return NetworkHelperImpl(connectivityManager)
     }
 
     @Singleton
@@ -33,5 +42,11 @@ object UtilsModule {
     @Provides
     fun provideLogger(): Logger {
         return AppLogger()
+    }
+
+    @Singleton
+    @Provides
+    fun provideFusedLocationProviderClient(@ApplicationContext context: Context): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(context)
     }
 }

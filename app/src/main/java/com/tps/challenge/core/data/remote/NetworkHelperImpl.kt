@@ -5,11 +5,9 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.tps.challenge.core.domain.remote.NetworkHelper
 
-class NetworkHelperImpl constructor(private val context: Context) : NetworkHelper {
+class NetworkHelperImpl constructor(private val connectivityManager: ConnectivityManager) : NetworkHelper {
     override fun isNetworkConnected(): Boolean {
         var result = false
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkCapabilities = connectivityManager.activeNetwork ?: return false
         val actNw =
             connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false

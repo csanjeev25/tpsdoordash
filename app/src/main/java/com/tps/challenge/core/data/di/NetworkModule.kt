@@ -3,6 +3,8 @@ package com.tps.challenge.core.data.di
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.tps.challenge.core.data.remote.RetrofitNetworkService
+import com.tps.challenge.core.data.utils.NetworkCacheInterceptor
+import com.tps.challenge.core.data.utils.OfflineCacheInterceptor
 import com.tps.challenge.core.domain.remote.NetworkService
 import dagger.Module
 import dagger.Provides
@@ -36,8 +38,10 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(offlineCacheInterceptor: OfflineCacheInterceptor, networkCacheInterceptor: NetworkCacheInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(offlineCacheInterceptor)
+            .addNetworkInterceptor(networkCacheInterceptor)
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
@@ -46,8 +50,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
-        val gson = GsonBuilder().create()
+    fun provideRetrofit(gson: Gson): Retrofit {
         val retrofit = Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))

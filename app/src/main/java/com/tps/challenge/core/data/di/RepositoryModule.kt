@@ -1,5 +1,6 @@
 package com.tps.challenge.core.data.di
 
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.tps.challenge.core.data.preferences.DefaultPreferences
 import com.tps.challenge.core.data.repository.CoreRepositoryImpl
 import com.tps.challenge.core.domain.preferences.Preferences
@@ -18,8 +19,8 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideCoreRepository(preferences: DefaultPreferences): CoreRepository {
-        return CoreRepositoryImpl(preferences)
+    fun provideCoreRepository(preferences: DefaultPreferences, fusedLocationProviderClient: FusedLocationProviderClient): CoreRepository {
+        return CoreRepositoryImpl(fusedLocationProviderClient, preferences)
     }
 
     @Provides

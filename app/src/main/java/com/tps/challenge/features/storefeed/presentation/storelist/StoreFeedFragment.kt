@@ -1,5 +1,6 @@
 package com.tps.challenge.features.storefeed.presentation.storelist
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -16,6 +19,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.tps.challenge.Constants
 import com.tps.challenge.R
 import com.tps.challenge.core.presentation.base.UiState
 import com.tps.challenge.core.presentation.utils.GlideImageLoader
@@ -31,36 +35,73 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class StoreFeedFragment : Fragment() {
-    companion object {
-        const val TAG = "StoreFeedFragment"
-    }
 
     private lateinit var storeFeedAdapter: StoreFeedAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var storeListViewModel: StoreListViewModel
+    private lateinit var progressBar: ProgressBar
+    private lateinit var retryButton: AppCompatButton
 
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+//    private val permissionLauncher = registerForActivityResult(
+//        ActivityResultContracts.RequestMultiplePermissions()
+//    ) { permissions ->
+//        storeListViewModel.onLocationPermissionResult(permissions.any { it.value == true })
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_store_feed, container, false)
-        setupViewModel()
         setupUI(view = view)
-        setupObserver(view = view)
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupViewModel()
+        setupObserver(view = view)
+    }
+
+    private fun setupUI(view: View) {
+        swipeRefreshLayout = view.findViewById(R.id.swipe_container)
+        recyclerView = view.findViewById(R.id.stores_view)
+        progressBar = view.findViewById(R.id.store_progress_bar)
+        retryButton = view.findViewById(R.id.store_try_again_button)
+
+        storeFeedAdapter = StoreFeedAdapter(imageLoader) { storeItem ->
+            val intent = Intent(requireContext(), StoreDetailActivity::class.java)
+            intent.putExtra("STORE_ID", storeItem.id)
+            startActivity(intent)
+        }
+
+        recyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(activity)
+            adapter = storeFeedAdapter
+        }
+
+        // Enable if Swipe-To-Refresh functionality will be needed
+        swipeRefreshLayout.isEnabled = false
+        swipeRefreshLayout.setOnRefreshListener {
+            storeListViewModel.useDefaultLocation()
+        }
+    }
+
+    private fun setupViewModel() {
+        storeListViewModel = ViewModelProvider(this)[StoreListViewModel::class.java]
+    }
+
     private fun setupObserver(view: View) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                permissionLauncher.launch(
+//                    mutableListOf(Manifest.permission.ACCESS_COARSE_LOCATION).toTypedArray()
+//                )
                 storeListViewModel.storeListUiState.collect {
                     when (it) {
                         is UiState.Success -> {
@@ -72,7 +113,7 @@ class StoreFeedFragment : Fragment() {
                                 findViewById<RecyclerView>(R.id.stores_view).visibility =
                                     View.VISIBLE
                             }
-                            storeFeedAdapter.addStores(it.data.storeList)
+                            storeFeedAdapter.updateStores(it.data.storeList)
                             storeFeedAdapter.notifyDataSetChanged()
                         }
 
@@ -114,31 +155,7 @@ class StoreFeedFragment : Fragment() {
         }
     }
 
-    private fun setupUI(view: View) {
-        swipeRefreshLayout = view.findViewById(R.id.swipe_container)
-        // Enable if Swipe-To-Refresh functionality will be needed
-        swipeRefreshLayout.isEnabled = false
-
-        swipeRefreshLayout.setOnRefreshListener {
-            storeListViewModel.fetchStores()
-        }
-
-        storeFeedAdapter = StoreFeedAdapter(
-            ArrayList(), {
-                val intent = Intent(requireContext(), StoreDetailActivity::class.java)
-                intent.putExtra("STORE_ID", it.id)
-                startActivity(intent)
-            }, imageLoader
-        )
-        recyclerView = view.findViewById(R.id.stores_view)
-        recyclerView.apply {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(activity)
-            adapter = storeFeedAdapter
-        }
-    }
-
-    private fun setupViewModel() {
-        storeListViewModel = ViewModelProvider(this)[StoreListViewModel::class.java]
+    companion object {
+        const val TAG = "StoreFeedFragment"
     }
 }
