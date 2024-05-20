@@ -15,7 +15,7 @@ import com.tps.challenge.features.storefeed.domain.model.StoreItem
  * A RecyclerView.Adapter to populate the screen with a store feed.
  */
 class StoreFeedAdapter(
-    private val imageLoader: ImageLoader
+    private val imageLoader: ImageLoader,
     private val onItemClicked: (StoreItem) -> Unit,
 ) : RecyclerView.Adapter<StoreItemViewHolder>() {
 
