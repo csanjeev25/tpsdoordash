@@ -18,9 +18,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tps.challenge.R
 import com.tps.challenge.core.presentation.base.UiState
+import com.tps.challenge.core.presentation.utils.GlideImageLoader
+import com.tps.challenge.core.presentation.utils.ImageLoader
 import com.tps.challenge.features.storefeed.presentation.storedetails.StoreDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.ArrayList
+import javax.inject.Inject
 
 /**
  * Displays the list of Stores with its title, description and the cover image to the user.
@@ -30,10 +34,14 @@ class StoreFeedFragment : Fragment() {
     companion object {
         const val TAG = "StoreFeedFragment"
     }
+
     private lateinit var storeFeedAdapter: StoreFeedAdapter
-    private lateinit var recyclerView : RecyclerView
-    private lateinit var swipeRefreshLayout : SwipeRefreshLayout
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var storeListViewModel: StoreListViewModel
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,9 +65,12 @@ class StoreFeedFragment : Fragment() {
                     when (it) {
                         is UiState.Success -> {
                             with(view) {
-                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility = View.GONE
-                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility = View.GONE
-                                findViewById<RecyclerView>(R.id.stores_view).visibility= View.VISIBLE
+                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility =
+                                    View.GONE
+                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility =
+                                    View.GONE
+                                findViewById<RecyclerView>(R.id.stores_view).visibility =
+                                    View.VISIBLE
                             }
                             storeFeedAdapter.addStores(it.data.storeList)
                             storeFeedAdapter.notifyDataSetChanged()
@@ -67,23 +78,35 @@ class StoreFeedFragment : Fragment() {
 
                         is UiState.Loading -> {
                             with(view) {
-                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility = View.VISIBLE
-                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility = View.GONE
-                                findViewById<RecyclerView>(R.id.stores_view).visibility= View.GONE
+                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility =
+                                    View.VISIBLE
+                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility =
+                                    View.GONE
+                                findViewById<RecyclerView>(R.id.stores_view).visibility = View.GONE
                             }
                         }
 
                         is UiState.Error -> {
                             with(view) {
-                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility = View.GONE
-                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility = View.VISIBLE
-                                findViewById<RecyclerView>(R.id.stores_view).visibility= View.GONE
+                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility =
+                                    View.GONE
+                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility =
+                                    View.VISIBLE
+                                findViewById<RecyclerView>(R.id.stores_view).visibility = View.GONE
                             }
-                            Toast.makeText(requireContext(), it.message.asString(requireContext()), Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                requireContext(),
+                                it.message.asString(requireContext()),
+                                Toast.LENGTH_SHORT
+                            )
                         }
 
                         is UiState.ShowSnackbar -> {
-                            Toast.makeText(requireContext(), it.message.asString(requireContext()), Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                requireContext(),
+                                it.message.asString(requireContext()),
+                                Toast.LENGTH_SHORT
+                            )
                         }
                     }
                 }
@@ -100,13 +123,13 @@ class StoreFeedFragment : Fragment() {
             storeListViewModel.fetchStores()
         }
 
-        storeFeedAdapter = StoreFeedAdapter(ArrayList()) {
-            val intent = Intent(requireContext(), StoreDetailActivity::class.java)
-            intent.putExtra("STORE_ID", it.id)
-            intent.putExtra("STORE_NAME", it.name)
-            intent.putExtra("STORE_DESCRIPTION", it.description)
-            startActivity(intent)
-        }
+        storeFeedAdapter = StoreFeedAdapter(
+            ArrayList(), {
+                val intent = Intent(requireContext(), StoreDetailActivity::class.java)
+                intent.putExtra("STORE_ID", it.id)
+                startActivity(intent)
+            }, imageLoader
+        )
         recyclerView = view.findViewById(R.id.stores_view)
         recyclerView.apply {
             setHasFixedSize(true)

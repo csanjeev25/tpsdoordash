@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tps.challenge.R
+import com.tps.challenge.core.presentation.utils.ImageLoader
 import com.tps.challenge.core.presentation.utils.ItemClickListener
 import com.tps.challenge.features.storefeed.domain.model.StoreItem
 
@@ -14,7 +15,8 @@ import com.tps.challenge.features.storefeed.domain.model.StoreItem
  */
 class StoreFeedAdapter(
     private val stores: ArrayList<StoreItem>,
-    private val onItemClicked: (StoreItem) -> Unit
+    private val onItemClicked: (StoreItem) -> Unit,
+    private val imageLoader: ImageLoader
 ) : RecyclerView.Adapter<StoreItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreItemViewHolder {
@@ -29,8 +31,9 @@ class StoreFeedAdapter(
         with(holder.itemView) {
             findViewById<TextView>(R.id.name).text = storeItem.name
             findViewById<TextView>(R.id.description).text = storeItem.description
+            imageLoader.load(storeItem.coverImgUrl, findViewById(R.id.store_image))
             setOnClickListener {
-
+                onItemClicked(storeItem)
             }
         }
     }
