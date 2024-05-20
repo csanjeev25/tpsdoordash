@@ -1,8 +1,8 @@
 package com.tps.challenge.core.presentation.base
 
-sealed interface UiState<out T> {
-    data class Success<T>(val data: T) : UiState<T>
-    data class Error(val message: UiText) : UiState<Nothing>
-    object Loading : UiState<Nothing>
-    data class ShowSnackbar(val message: UiText): UiState<Nothing>
+sealed interface UiEvent<out T> {
+    data class Success<T>(val data: T) : UiEvent<T>
+    data class Error(val message: UiText) : UiEvent<Nothing>
+    object Loading : UiEvent<Nothing>
+    data class ShowSnackbar(val message: UiText): UiEvent<Nothing>
 }

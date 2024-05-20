@@ -12,14 +12,10 @@ class OfflineCacheInterceptor(
 ): Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
+        val builder = request.newBuilder()
         if (!networkHelper.isNetworkConnected()) {
-            val cacheControl = CacheControl.Builder()
-                .maxStale(12, TimeUnit.HOURS)
-                .build()
-            request = request.newBuilder()
-                .cacheControl(cacheControl)
-                .build()
+            builder.cacheControl(CacheControl.FORCE_CACHE)
         }
-        return chain.proceed(request)
+        return chain.proceed(builder.build())
     }
 }

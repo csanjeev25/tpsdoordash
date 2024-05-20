@@ -1,6 +1,5 @@
 package com.tps.challenge.features.storefeed.presentation.storelist
 
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -19,15 +16,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.tps.challenge.Constants
 import com.tps.challenge.R
-import com.tps.challenge.core.presentation.base.UiState
-import com.tps.challenge.core.presentation.utils.GlideImageLoader
+import com.tps.challenge.core.presentation.base.UiEvent
 import com.tps.challenge.core.presentation.utils.ImageLoader
 import com.tps.challenge.features.storefeed.presentation.storedetails.StoreDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -90,6 +84,10 @@ class StoreFeedFragment : Fragment() {
         swipeRefreshLayout.setOnRefreshListener {
             storeListViewModel.useDefaultLocation()
         }
+
+        retryButton.setOnClickListener {
+            storeListViewModel.useDefaultLocation()
+        }
     }
 
     private fun setupViewModel() {
@@ -102,54 +100,15 @@ class StoreFeedFragment : Fragment() {
 //                permissionLauncher.launch(
 //                    mutableListOf(Manifest.permission.ACCESS_COARSE_LOCATION).toTypedArray()
 //                )
-                storeListViewModel.storeListUiState.collect {
-                    when (it) {
-                        is UiState.Success -> {
-                            with(view) {
-                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility =
-                                    View.GONE
-                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility =
-                                    View.GONE
-                                findViewById<RecyclerView>(R.id.stores_view).visibility =
-                                    View.VISIBLE
-                            }
-                            storeFeedAdapter.updateStores(it.data.storeList)
-                            storeFeedAdapter.notifyDataSetChanged()
-                        }
+                storeListViewModel.storeListUiState.collect { state ->
+                    progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+                    retryButton.visibility = if (state.error != null) View.VISIBLE else View.GONE
+                    recyclerView.visibility = if (!state.isLoading && state.error == null) View.VISIBLE else View.GONE
 
-                        is UiState.Loading -> {
-                            with(view) {
-                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility =
-                                    View.VISIBLE
-                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility =
-                                    View.GONE
-                                findViewById<RecyclerView>(R.id.stores_view).visibility = View.GONE
-                            }
-                        }
-
-                        is UiState.Error -> {
-                            with(view) {
-                                findViewById<ProgressBar>(R.id.store_progress_bar).visibility =
-                                    View.GONE
-                                findViewById<AppCompatButton>(R.id.store_try_again_button).visibility =
-                                    View.VISIBLE
-                                findViewById<RecyclerView>(R.id.stores_view).visibility = View.GONE
-                            }
-                            Toast.makeText(
-                                requireContext(),
-                                it.message.asString(requireContext()),
-                                Toast.LENGTH_SHORT
-                            )
-                        }
-
-                        is UiState.ShowSnackbar -> {
-                            Toast.makeText(
-                                requireContext(),
-                                it.message.asString(requireContext()),
-                                Toast.LENGTH_SHORT
-                            )
-                        }
+                    if (state.error != null) {
+                        Toast.makeText(requireContext(), state.error.asString(requireContext()), Toast.LENGTH_SHORT).show()
                     }
+                    storeFeedAdapter.updateStores(state.storeList)
                 }
             }
         }

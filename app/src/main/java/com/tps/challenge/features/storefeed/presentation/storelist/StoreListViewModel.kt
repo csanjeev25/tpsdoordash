@@ -1,5 +1,6 @@
 package com.tps.challenge.features.storefeed.presentation.storelist
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +10,7 @@ import com.tps.challenge.core.domain.remote.NetworkHelper
 import com.tps.challenge.core.domain.usecase.LocationUseCases
 import com.tps.challenge.core.domain.utils.DispatcherProvider
 import com.tps.challenge.core.domain.utils.Logger
-import com.tps.challenge.core.presentation.base.UiState
+import com.tps.challenge.core.presentation.base.UiEvent
 import com.tps.challenge.core.presentation.base.UiText
 import com.tps.challenge.features.storefeed.domain.usecase.StoreListUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,8 +29,8 @@ class StoreListViewModel @Inject constructor(
     private val networkHelper: NetworkHelper,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _storeListUiState = MutableStateFlow<UiState<StoreListState>>(UiState.Loading)
-    val storeListUiState: StateFlow<UiState<StoreListState>> = _storeListUiState
+    private val _storeListUiState = MutableStateFlow<StoreListState>(StoreListState(emptyList(), true))
+    val storeListUiState: StateFlow<StoreListState> = _storeListUiState
     private var fetchStoresJob: Job? = null
 
     init {
@@ -125,26 +126,24 @@ class StoreListViewModel @Inject constructor(
             return
         }
         fetchStoresJob = viewModelScope.launch(dispatcherProvider.io) {
-            _storeListUiState.value = UiState.Loading
+            _storeListUiState.value = _storeListUiState.value.copy(isLoading = true)
             try {
                 if (!networkHelper.isNetworkConnected()) {
                     _storeListUiState.value =
-                        UiState.Error(UiText.StaticString(R.string.no_internet_connection))
+                        _storeListUiState.value.copy(isLoading = false, error = UiText.StaticString(R.string.no_internet_connection))
                     return@launch
                 }
 
                 val storeResult = storeListUseCases.getStoreList(lat, long)
                 storeResult.onSuccess {
-                    _storeListUiState.value = UiState.Success(StoreListState(it))
+                    _storeListUiState.value = _storeListUiState.value.copy(isLoading = false, storeList = it)
                 }.onFailure { exception ->
                     logger.d(TAG, "Failed to fetch stores: ${exception.localizedMessage}")
-                    _storeListUiState.value =
-                        UiState.Error(UiText.StaticString(R.string.something_went_wrong))
+                    _storeListUiState.value = _storeListUiState.value.copy(isLoading = false, error = UiText.StaticString(R.string.something_went_wrong))
                 }
             } catch (exception: Exception) {
                 logger.d(TAG, "Exception in fetchStores: ${exception.localizedMessage}")
-                _storeListUiState.value =
-                    UiState.Error(UiText.StaticString(R.string.something_went_wrong))
+                _storeListUiState.value = _storeListUiState.value.copy(isLoading = false, error = UiText.StaticString(R.string.something_went_wrong))
             } finally {
                 fetchStoresJob = null
             }
