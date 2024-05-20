@@ -10,7 +10,7 @@ import com.tps.challenge.features.storefeed.domain.repository.StoreListRepositor
 class StoreListRepositoryImpl(
     private val apiService: StoreApiService
 ): StoreListRepository {
-    override suspend fun getStoreList(lat: Double, long: Double): Result<List<StoreItem?>> {
+    override suspend fun getStoreList(lat: Double, long: Double): Result<List<StoreItem>> {
         return try {
             val storeList = apiService.getStoreFeed(lat, long)
             Result.success(storeList.mapNotNull {

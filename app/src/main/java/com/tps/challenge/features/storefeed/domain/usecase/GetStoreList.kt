@@ -9,7 +9,7 @@ class GetStoreList(
     suspend operator fun invoke(
         lat: Double?,
         long: Double?
-    ): Result<List<StoreItem?>> {
+    ): Result<List<StoreItem>> {
         val latitude = lat ?: DEFAULT_LATITUDE
         val longitude = long ?: DEFAULT_LONGITUDE
 

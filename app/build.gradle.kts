@@ -32,6 +32,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.activity:activity:1.9.0")
     // Network
     val okhttpVersion = "4.9.3"
     val retrofitVersion = "2.9.0"

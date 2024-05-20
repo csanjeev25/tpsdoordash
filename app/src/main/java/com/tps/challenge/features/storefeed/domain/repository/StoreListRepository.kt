@@ -6,5 +6,5 @@ interface StoreListRepository {
     suspend fun getStoreList(
         lat: Double,
         long: Double
-    ): Result<List<StoreItem?>>
+    ): Result<List<StoreItem>>
 }

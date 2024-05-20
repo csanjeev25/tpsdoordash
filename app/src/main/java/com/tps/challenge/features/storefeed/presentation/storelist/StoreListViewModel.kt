@@ -3,6 +3,7 @@ package com.tps.challenge.features.storefeed.presentation.storelist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tps.challenge.R
+import com.tps.challenge.core.domain.model.Location
 import com.tps.challenge.core.domain.remote.NetworkHelper
 import com.tps.challenge.core.domain.usecase.LocationUseCases
 import com.tps.challenge.core.domain.utils.DispatcherProvider
@@ -28,13 +29,15 @@ class StoreListViewModel @Inject constructor(
     private val _storeListUiState = MutableStateFlow<UiState<StoreListState>>(UiState.Loading)
     val storeListUiState: StateFlow<UiState<StoreListState>> = _storeListUiState
 
+    private var location: Location? = null
+
     private fun checkIfInternetConnection(): Boolean = networkHelper.isNetworkConnected()
 
     init {
-        startFetchingStores()
+        fetchStores()
     }
 
-    private fun startFetchingStores() {
+    fun fetchStores() {
         viewModelScope.launch {
             _storeListUiState.value = UiState.Loading
             try {
@@ -47,10 +50,13 @@ class StoreListViewModel @Inject constructor(
                             R.string.no_internet_connection
                         )
                     )
-                    val location = locationUseCases.getLocation()
+                    if (location == null) {
+                        location = locationUseCases.getLocation()
+                            .getOrNull()
+                    }
                     storeListUseCase.getStoreList(
-                        location.getOrNull()?.lat,
-                        location.getOrNull()?.long
+                        location?.lat,
+                        location?.long
                     )
                 }
                 storeResult

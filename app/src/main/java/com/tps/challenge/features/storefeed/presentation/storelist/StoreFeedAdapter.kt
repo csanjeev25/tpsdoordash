@@ -6,11 +6,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tps.challenge.R
+import com.tps.challenge.core.presentation.utils.ItemClickListener
+import com.tps.challenge.features.storefeed.domain.model.StoreItem
 
 /**
  * A RecyclerView.Adapter to populate the screen with a store feed.
  */
-class StoreFeedAdapter: RecyclerView.Adapter<StoreItemViewHolder>() {
+class StoreFeedAdapter(
+    private val stores: ArrayList<StoreItem>,
+    private val onItemClicked: (StoreItem) -> Unit
+) : RecyclerView.Adapter<StoreItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreItemViewHolder {
         return StoreItemViewHolder(
@@ -20,16 +25,22 @@ class StoreFeedAdapter: RecyclerView.Adapter<StoreItemViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: StoreItemViewHolder, position: Int) {
-        TODO("Not yet implemented")
-
+        val storeItem = stores[position]
         with(holder.itemView) {
-            findViewById<TextView>(R.id.name).text = TODO("provide store name")
-            findViewById<TextView>(R.id.description).text = TODO("provide store description")
+            findViewById<TextView>(R.id.name).text = storeItem.name
+            findViewById<TextView>(R.id.description).text = storeItem.description
+            setOnClickListener {
+
+            }
         }
     }
 
     override fun getItemCount(): Int {
-        TODO("Not yet implemented")
+        return if (stores != null) stores.size else 0
+    }
+
+    fun addStores(list: List<StoreItem>) {
+        stores.addAll(list)
     }
 }
 
