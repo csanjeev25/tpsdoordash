@@ -1,5 +1,6 @@
 package com.tps.challenge.core.data.utils
 
+import android.util.Log
 import com.tps.challenge.core.domain.remote.NetworkHelper
 import okhttp3.CacheControl
 import okhttp3.Interceptor

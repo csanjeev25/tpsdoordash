@@ -1,10 +1,12 @@
 package com.tps.challenge.core.data.di
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.tps.challenge.core.data.remote.RetrofitNetworkService
 import com.tps.challenge.core.data.utils.NetworkCacheInterceptor
 import com.tps.challenge.core.data.utils.OfflineCacheInterceptor
+import com.tps.challenge.core.domain.remote.NetworkHelper
 import com.tps.challenge.core.domain.remote.NetworkService
 import dagger.Module
 import dagger.Provides
@@ -34,6 +36,18 @@ object NetworkModule {
             .setPrettyPrinting()
             .serializeNulls()
             .create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOfflineCacheInterceptor(networkHelper: NetworkHelper): OfflineCacheInterceptor {
+        return OfflineCacheInterceptor(networkHelper)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkCacheInterceptor(): NetworkCacheInterceptor {
+        return NetworkCacheInterceptor()
     }
 
     @Provides

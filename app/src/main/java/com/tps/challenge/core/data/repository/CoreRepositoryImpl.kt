@@ -11,6 +11,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.tps.challenge.core.data.preferences.DefaultPreferences
 import com.tps.challenge.core.domain.model.Location
+import com.tps.challenge.core.domain.preferences.Preferences
 import com.tps.challenge.core.domain.repository.CoreRepository
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -18,7 +19,7 @@ import kotlin.coroutines.resumeWithException
 
 class CoreRepositoryImpl(
     private val fusedLocationClient: FusedLocationProviderClient,
-    private val preferences: DefaultPreferences
+    private val preferences: Preferences
 ): CoreRepository {
     override suspend fun getLocation(): Result<Location?> {
         return try {

@@ -19,7 +19,7 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideCoreRepository(preferences: DefaultPreferences, fusedLocationProviderClient: FusedLocationProviderClient): CoreRepository {
+    fun provideCoreRepository(preferences: Preferences, fusedLocationProviderClient: FusedLocationProviderClient): CoreRepository {
         return CoreRepositoryImpl(fusedLocationProviderClient, preferences)
     }
 
