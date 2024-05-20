@@ -64,11 +64,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(gson: Gson): Retrofit {
+    fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): Retrofit {
         val retrofit = Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .baseUrl(BASE_URL)
+            .client(okHttpClient)
             .build()
         return retrofit
     }
